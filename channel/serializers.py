@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
+from .models import Membership, Roles
 
 class CustomUserSeriailizer(serializers.ModelSerializer):
     class Meta:
@@ -22,6 +23,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.Charfield(write_only=True)
+    
 
     def validate(self, data):
         user = get_user_model().objects.filter(username=data['username']).first()
@@ -34,3 +36,19 @@ class TokenSerializer(serializers.ModelSerializer):
     class Meta:
         model =Token
         fields = ['key']
+
+
+# serializing membership model
+class MembershipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Membership
+        fields = ['user', 'start_date', 'end_date', 'membership_type']
+
+
+# serializing the roles model
+class RolesSerializer(serializers.ModelSerializer):
+    users = serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects.all(), many=True)
+
+    class Meta:
+        model = Roles
+        fields = ['id', 'name', 'description', 'users']

@@ -3,9 +3,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
-from rest_framework import status
-from serializers import RegisterSerializer, LoginSerializer, TokenSerializer
+from rest_framework import status, viewsets
+from .serializers import RegisterSerializer, LoginSerializer, TokenSerializer,MembershipSerializer,RolesSerializer
 from rest_framework.authtoken.models import Token
+from .models import Roles
+
 
 # Create your views here.
 
@@ -49,3 +51,12 @@ class TokenView(APIView):
                 return Response({'detail' : 'Token not found'}, status=status.HTTP_404_NOT_FOUND)
         return Response({'detail' : 'No token provided'}, status=status.HTTP_400_BAD_REQUEST)
     
+
+#view for membership
+class MembershipViewSet(viewsets.ModelViewSet):
+    serializer_class = MembershipSerializer
+
+#view for roles
+class RolesViewSet(viewsets.ModelViewSet):
+    queryset = Roles.objects.all()
+    serializer_class = RolesSerializer

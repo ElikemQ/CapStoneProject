@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
-from .models import Membership, Roles
+from .models import Membership, Roles, Payments, Anouncements, Transactions
 
 class CustomUserSeriailizer(serializers.ModelSerializer):
     class Meta:
@@ -22,7 +22,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
-    password = serializers.Charfield(write_only=True)
+    password = serializers.CharField(write_only=True)
     
 
     def validate(self, data):
@@ -42,7 +42,8 @@ class TokenSerializer(serializers.ModelSerializer):
 class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Membership
-        fields = ['user', 'start_date', 'end_date', 'membership_type']
+        fields = '__all__'
+        # fields = ['user', 'start_date', 'end_date', 'membership_type']
 
 
 # serializing the roles model
@@ -52,3 +53,30 @@ class RolesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Roles
         fields = ['id', 'name', 'description', 'users']
+
+
+#serializing the payments model
+class PaymentsSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects.all())
+    Membership = serializers.PrimaryKeyRelatedField(queryset=Membership.objects.all())
+
+    class Meta:
+        model = Payments
+        fields = ['user', 'membership', 'amount', 'payment_date', 'payment_type']
+
+
+#serializing the announcements model 
+class AnnouncementsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Anouncements
+        fields = ['id', 'title', 'content', 'date', 'active']
+
+# serializer for transactions
+class TransactionsSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = Transactions
+        fields = ['id', 'user', 'amount', 'payment_method', 'payment_date', 'reference_id', 'description']
+        read_only_fields = ['user', 'payment_date']
+

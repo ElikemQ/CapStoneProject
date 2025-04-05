@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'channel',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -78,8 +79,12 @@ WSGI_APPLICATION = "gym_api.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": 'gym_api',
+        "USER": 'root',
+        "PASSWORD": 'qwerty',
+        "HOST": 'localhost',
+        "PORT": '3306'
     }
 }
 
@@ -129,5 +134,5 @@ AUTH_USER_MODEL = 'channel.CustomUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.TokenAuthentication',],
-    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permission.IsAuthenticated',],
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated',],
 }

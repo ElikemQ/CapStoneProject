@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from rest_framework.authtoken.models import Token
-from .models import Membership, Roles, Payments, Anouncements, Transactions
+from .models import Membership, Roles, Payments, Anouncements, Transactions, CustomUser
 
 class CustomUserSeriailizer(serializers.ModelSerializer):
     class Meta:
@@ -26,10 +26,13 @@ class LoginSerializer(serializers.Serializer):
     
 
     def validate(self, data):
-        user = get_user_model().objects.filter(username=data['username']).first()
-        if user and user.check_password(data['password']):
+        user = authenticate(username=data['username'], password=data['password'])
+        if user:
             return user
         raise serializers.ValidationError('Credentials Invalid')
+    
+    def create(self, validated_data):
+        return CustomUser.objects.create_user(**validated_data)
     
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -42,8 +45,7 @@ class TokenSerializer(serializers.ModelSerializer):
 class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Membership
-        fields = '__all__'
-        # fields = ['user', 'start_date', 'end_date', 'membership_type']
+        fields = ['user', 'start_date', 'end_date', 'membership_type']
 
 
 # serializing the roles model

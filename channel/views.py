@@ -29,7 +29,7 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data
-            token, created = Token.objects.get_or_create(user=user)
+            token, _ = Token.objects.get_or_create(user=user)
             return Response({'user': RegisterSerializer(user).data,
                              'token': TokenSerializer(token).data}, status=status.HTTP_200_OK)
         return Response({'detail': 'Credentials Invalid'}, status=status.HTTP_400_BAD_REQUEST)
@@ -40,10 +40,11 @@ class TokenView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        token = request.headers.get('Authorization')
-        if token:
+        auth_header = request.headers.get('Authorization')
+        if auth_header and auth_header.startswith('Token '):
+            token_key = auth_header.split('Token ')[1]
             try:
-                token_obj = Token.objects.get(key=token)
+                token_obj = Token.objects.get(key=token_key)
                 return Response({'token': token_obj.key}, status=status.HTTP_200_OK)
             except Token.DoesNotExist:
                 return Response({'detail' : 'Token not found'}, status=status.HTTP_404_NOT_FOUND)
